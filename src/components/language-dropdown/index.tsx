@@ -78,11 +78,11 @@ const LanguageItem: React.FunctionComponent<LanguageItemProps> = ({ state, langu
     case "Add-language":
       return (
         <div
-          className={cn("w-full h-auto p-4 font-medium text-lg tracking-tight bg-white rounded-md border border-transparent")}
+          className={cn("w-full h-auto p-4 font-medium text-lg tracking-tight bg-white rounded-md border border-transparent shadow")}
           {...props}
         >
           <input
-            className="focus:outline-none"
+            className="focus:outline-none w-full"
             type={"text"}
             placeholder="Search for languages"
             defaultValue={languageInput}
@@ -117,7 +117,7 @@ const LanguageItem: React.FunctionComponent<LanguageItemProps> = ({ state, langu
     case "Language":
       return (
         <div
-          className="flex flex-row items-center justify-between w-full h-auto p-4 text-neutral-100 font-medium text-lg tracking-tight bg-gradient-to-t from-neutral-900 to-neutral-700 rounded-md border border-transparent cursor-grab"
+          className="flex flex-row items-center justify-between w-full h-auto p-4 text-neutral-100 font-medium text-lg tracking-tight bg-gradient-to-t from-neutral-900 to-neutral-700 rounded-md border border-transparent cursor-grab shadow-xl"
           {...props}
           onClick={() => setLanguageEditingMode("Add-language")}
         >
