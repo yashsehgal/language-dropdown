@@ -15,3 +15,10 @@
 body, html {
   @apply selection:bg-pink-600 selection:text-neutral-100;
 }
+
+.Language-item.dragging {
+  opacity: 0.2;
+}
+.Language-item.dragging :where(.details, i) {
+  opacity: 0;
+}
