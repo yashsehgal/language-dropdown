@@ -1,6 +1,10 @@
 import { useEffect, useState } from "react";
 import { LanguageItemProps } from "./types";
-import { cn } from "../../utils/cn";
+import {
+  cn
+} from "../../utils/cn";
+
+import { MotionProps, motion } from "framer-motion";
 
 import {
   Command,
@@ -15,6 +19,7 @@ import {
 } from "../command-select";
 import Button from "../button";
 import { Grip } from "lucide-react";
+import { recommendLanguages } from "../../utils/recommendLanguages";
 
 const LanguageDropdown: React.FunctionComponent = () => {
   const [addedLanguages, setAddedLanguages] =
@@ -26,7 +31,12 @@ const LanguageDropdown: React.FunctionComponent = () => {
       for (let count = 0; count < 10; count++) {
         setAddedLanguages([
           ...addedLanguages,
-          { state: "No-language" },
+          {
+            state: "No-language", languageData: {
+              title: "",
+              rank: count
+            }
+          },
         ])
       }
     }
@@ -64,10 +74,10 @@ const LanguageDropdown: React.FunctionComponent = () => {
       }
 
       sortableList.addEventListener("dragover", initSortableList);
-      // @ts-ignore
-      sortableList.addEventListener("dragenter", e => e.preventDefault());
+      sortableList.addEventListener("dragenter",
+        (e: React.ChangeEvent<any>) => e.preventDefault());
     }
-  }, [window, document]);
+  }, []);
 
   return (
     <div className="w-[840px] h-auto rounded-lg border border-neutral-200 p-4">
@@ -81,6 +91,7 @@ const LanguageDropdown: React.FunctionComponent = () => {
               className={"Language-item mb-4"}
               state={language.state}
               languageData={language.languageData}
+              setAddedLanguages={setAddedLanguages}
               key={index}
             />
           )
@@ -90,8 +101,13 @@ const LanguageDropdown: React.FunctionComponent = () => {
   )
 };
 
-const LanguageItem: React.FunctionComponent<LanguageItemProps> = ({ className, state, languageData, ...props }) => {
-  const [languageInput, setLanguageInput] = useState<string>("");
+const LanguageItem: React.FunctionComponent<LanguageItemProps> = ({
+  className,
+  state,
+  languageData,
+  setAddedLanguages,
+  ...props }) => {
+  const [languageInput, setLanguageInput] = useState<string>(languageData?.title || "");
   const [languageEditingMode, setLanguageEditingMode]
     = useState<"No-language" | "Add-language" | "Language">(state);
 
@@ -99,7 +115,35 @@ const LanguageItem: React.FunctionComponent<LanguageItemProps> = ({ className, s
     = useState<"No-language" | "Add-language" | "Language">(state);
 
   const [languageRecommendation, setLanguageRecommendation]
-    = useState<Array<string>>([] as string[]);
+    = useState<any[]>([]);
+
+  // fetching language recommendations
+  useEffect(() => {
+    if (languageInput.length === 1) {
+      (async () => {
+        setLanguageRecommendation(
+          await recommendLanguages()
+        )
+      })();
+    }
+
+    // filtering the list of recommended languages
+    function filterRecommendations(allRecommendations: string[], inputString: string) {
+      return allRecommendations.filter((_language) => {
+        if (_language.startsWith(inputString) || _language.includes(inputString)) {
+          return _language;
+        }
+      })
+    }
+    setLanguageRecommendation(
+      filterRecommendations(languageRecommendation, languageInput.toLowerCase())
+    )
+  }, [languageInput]);
+
+  // method to update language in input via recommendations
+  const changeLanguageViaRecommendation = (language: string) => {
+    setLanguageInput(language);
+  };
 
   switch (languageEditingMode) {
     case "No-language":
@@ -126,9 +170,28 @@ const LanguageItem: React.FunctionComponent<LanguageItemProps> = ({ className, s
             className="focus:outline-none w-full"
             type={"text"}
             placeholder="Search for languages"
-            defaultValue={languageInput}
             onChange={(e) => setLanguageInput(e.target.value as string)}
+            value={languageInput}
           />
+          {languageRecommendation && <div className="Language-recommendationsWrapper my-2 grid grid-cols-1 gap-2 max-h-[240px] overflow-y-scroll">
+            {languageRecommendation?.map((recommendation: any, recommendationIndex: number) => {
+              return (
+                <Button
+                  variant="Outline"
+                  className="px-2 py-1 rounded-sm text-sm font-normal truncate"
+                  onClick={() => {
+                    // changing the languageInput with the selected language recommendation
+                    changeLanguageViaRecommendation(recommendation);
+                    // reseting the states
+                    setLanguageRecommendation([]);
+                  }}
+                  key={recommendationIndex}
+                >
+                  {recommendation}
+                </Button>
+              )
+            })}
+          </div>}
           <div className="flex flex-row items-center justify-end gap-2 mt-2">
             <Button
               variant="Outline"
@@ -144,16 +207,19 @@ const LanguageItem: React.FunctionComponent<LanguageItemProps> = ({ className, s
                 if (languageInput) {
                   setLanguageEditingMode("Language");
                   setCurrentDefaultEditingMode("Language");
+                  for (let count = 0; count)
                 } else {
                   setLanguageEditingMode("No-language");
                   setCurrentDefaultEditingMode("No-language");
                 }
+                // reseting the states
+                setLanguageRecommendation([]);
               }}
             >
               {"Save"}
             </Button>
           </div>
-        </div>
+        </div >
       )
     case "Language":
       return (

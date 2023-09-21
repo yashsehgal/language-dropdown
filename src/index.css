@@ -19,6 +19,6 @@ body, html {
 .Language-item.dragging {
   opacity: 0.2;
 }
-.Language-item.dragging :where(.details, i) {
+.Language-item.dragging > * {
   opacity: 0;
 }
