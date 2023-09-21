@@ -1,11 +1,10 @@
-import { ReactNode } from "react";
 
-declare interface LanguageItemProps extends React.HTMLAttributes<HTMLElement> {
-  state: "No-language" | "Add-language" | "Language";
-  languageData?: {
-    title?: string;
-    rank?: number;
-    leadingIcon?: ReactNode;
-  };
-  setAddedLanguages?: (D: LanguageItemProps[]) => void;
+declare type LanguageItemDataType = {
+  title: string;
+  position: number;
+};
+declare interface LanguageItemProps {
+  data: LanguageItemDataType;
+  languageList?: LanguageItemDataType[];
+  setLanguageList?: any;
 };

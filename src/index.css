@@ -16,9 +16,10 @@ body, html {
   @apply selection:bg-pink-600 selection:text-neutral-100;
 }
 
-.Language-item.dragging {
-  opacity: 0.2;
+* {
+  -ms-overflow-style: none;  /* Internet Explorer 10+ */
+  scrollbar-width: none;  /* Firefox */
 }
-.Language-item.dragging > * {
-  opacity: 0;
+*::-webkit-scrollbar { 
+  display: none;  /* Safari and Chrome */
 }
