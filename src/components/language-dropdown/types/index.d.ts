@@ -9,3 +9,8 @@ declare interface LanguageItemProps {
   languageList?: LanguageItemDataType[];
   setLanguageList?: any;
 };
+
+declare type LanguageRecommendationType = {
+  value: string;
+  label: string;
+};

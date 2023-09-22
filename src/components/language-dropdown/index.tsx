@@ -1,12 +1,16 @@
 import { useEffect, useState } from "react"
+
 import Button from "../button";
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "../dialog";
 import { Label } from "../label";
 import { Input } from "../input";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "../dialog";
+
 import { GripVertical, X } from "lucide-react";
-import { fetchLanguageList, updateLanguageItemRemovalOnFirebase, updateLanguageList } from "../../utils/updateFirebase";
 
 import Skeleton from 'react-loading-skeleton';
+
+import { fetchLanguageList, updateLanguageItemRemovalOnFirebase, updateLanguageList } from "../../utils/updateFirebase";
+import { cn } from "../../utils/cn";
 
 const LanguageDropdown = () => {
   // to store & manage the languages list
@@ -14,7 +18,17 @@ const LanguageDropdown = () => {
   // to manage the input for adding new languages
   const [newLanguageInput, setNewLanguageInput] = useState<string>("");
   // to manage the state with there's no data from firebase and local array.
-  const [hasNoData, setHasNoData] = useState(true);
+  const [hasNoData, setHasNoData] = useState<boolean>(true);
+  // to manage the open state for combobox-select component
+  const [open, setOpen] = useState<boolean>(false);
+
+  // to manage the language/frameworks recommendations
+  const [recommendations, setRecommendations] = useState<LanguageRecommendationType[]>([
+    {
+      value: "React",
+      label: "React"
+    }
+  ]);
 
   // Method to manage the input changes in the newLanguage flow
   const handleNewLanguageInput = (inputString: string) => {
@@ -47,7 +61,6 @@ const LanguageDropdown = () => {
         <p className="leading-snug font-normal text-sm text-neutral-500 tracking-tight">
           {"The skills you mention here will help hackathon organizers in assessing you as a potential participant."}
         </p>
-        {/* Dialog component for taking inputs for new languages */}
         <Dialog>
           <DialogTrigger asChild>
             <Button>Add language</Button>
@@ -107,7 +120,7 @@ const LanguageDropdown = () => {
             </div>
           </DialogContent>
         </Dialog>
-      </div>
+      </div >
       <div className="languages-list-container my-4 grid grid-cols-2 gap-4">
         {(languageList.length) ? languageList.map((language, languageIndex) => {
           return (
@@ -128,7 +141,7 @@ const LanguageDropdown = () => {
             </>
         )}
       </div>
-    </div>
+    </div >
   )
 };
 
@@ -154,12 +167,16 @@ const LanguageItem: React.FunctionComponent<LanguageItemProps> = ({ data, langua
   };
 
   return (
-    <div className="language-item p-4 shadow-lg rounded-lg bg-gradient-to-t from-neutral-900 to-neutral-700 flex flex-row items-center justify-between">
+    <div className="language-item p-4 shadow-lg rounded-lg bg-gradient-to-t from-neutral-900 to-neutral-700 flex flex-row items-center justify-between"
+      draggable
+    >
       <div className="language-item-content-wrapper font-medium text-lg text-neutral-100">
         {data.title}
       </div>
       <div className="flex flex-row items-center justify-end gap-2">
-        <GripVertical color="rgb(163 163 163)" />
+        <GripVertical color="rgb(163 163 163)"
+          className="cursor-grab"
+        />
         <Button
           variant="Outline"
           className="p-2 bg-neutral-700 border-transparent hover:bg-neutral-700/60"
