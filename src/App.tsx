@@ -1,4 +1,3 @@
-import Button from './components/button';
 import LanguageDropdown from './components/language-dropdown';
 
 const App: React.FunctionComponent = () => {
