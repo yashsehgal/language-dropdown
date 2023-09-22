@@ -9,7 +9,7 @@ const updateLanguageList = async (data: LanguageItemDataType) => {
     const docRef = await addDoc(collection(db, "user-languages"), {
       ...data
     });
-    console.log("Document written on firebase > firestore, with ID", docRef.id);
+    console.info("Document written on firebase > firestore, with ID", docRef.id);
   } catch (err) {
     console.error("Error adding document on firebase", err);
   }

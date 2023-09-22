@@ -10,6 +10,7 @@ import { GripVertical, X } from "lucide-react";
 import Skeleton from 'react-loading-skeleton';
 
 import { fetchLanguageList, updateLanguageItemRemovalOnFirebase, updateLanguageItemReorderOnFirebase, updateLanguageList } from "../../utils/updateFirebase";
+import { recommendLanguages } from "../../utils/recommendLanguages";
 import { cn } from "../../utils/cn";
 
 const LanguageDropdown = () => {
@@ -19,10 +20,30 @@ const LanguageDropdown = () => {
   const [newLanguageInput, setNewLanguageInput] = useState<string>("");
   // to manage the state with there's no data from firebase and local array.
   const [hasNoData, setHasNoData] = useState<boolean>(true);
+  // to manage the langauge recommendations array.
+  const [recommendations, setRecommendations] = useState<string[]>([]);
 
   // Method to manage the input changes in the newLanguage flow
-  const handleNewLanguageInput = (inputString: string) => {
+  const handleNewLanguageInput = async (inputString: string) => {
+    // when the input string is null, reset all the language recommendations
+    if (!inputString) setRecommendations([]);
     setNewLanguageInput(inputString);
+    // Rendering recommendations...
+    handleRecommendations();
+  };
+
+  // To handle the recommendations
+  const handleRecommendations = async () => {
+    // Do nothing when the new input string of language is empty.
+    if (!newLanguageInput) return;
+    // If not, then fetch & filter the recommendations
+    let _recommendations: string[] = await recommendLanguages() as any;
+    _recommendations = await _recommendations.filter((languageItem: string) => {
+      if (languageItem.includes(newLanguageInput) || languageItem.startsWith(newLanguageInput)) {
+        return languageItem;
+      }
+    });
+    setRecommendations(_recommendations);
   };
 
   // To manage the preload when the UI renders
@@ -90,6 +111,7 @@ const LanguageDropdown = () => {
     // refresh the main languageList
     setLanguageList(_languageList);
 
+    // To prevent the firebase and local state renders.
     e.preventDefault();
   }
 
@@ -115,10 +137,25 @@ const LanguageDropdown = () => {
                   type="text"
                   placeholder="Javascript, Python, NodeJS..."
                   className="mt-2"
+                  value={newLanguageInput}
                   onChange={(e) => handleNewLanguageInput(e.target.value as string)}
                 />
               </div>
             </div>
+            {recommendations.length >= 0 && <div className="overflow-y-scroll min-h-fit h-fit max-h-[240px] w-full grid grid-cols-1 gap-2">
+              {recommendations?.map((recommendation, recommendationIndex) => {
+                return (
+                  <Button
+                    variant="Outline"
+                    className="text-xs truncate w-full h-fit"
+                    onClick={() => setNewLanguageInput(recommendation)}
+                    key={recommendationIndex}
+                  >
+                    {recommendation}
+                  </Button>
+                )
+              })}
+            </div>}
             <div className="flex flex-row items-center justify-end gap-2">
               <DialogTrigger asChild>
                 <Button
@@ -145,12 +182,16 @@ const LanguageDropdown = () => {
                         title: newLanguageInput,
                         position: languageList.length
                       }
-                    ])
+                    ]);
                     // updating the data on firebase > firestore
                     updateLanguageList({
                       title: newLanguageInput,
                       position: languageList.length
                     });
+
+                    // Reseting the new input language data for later...
+                    setNewLanguageInput("");
+                    setRecommendations([]);
                   }}
                 >
                   Save language
@@ -160,7 +201,9 @@ const LanguageDropdown = () => {
           </DialogContent>
         </Dialog>
       </div >
-      <div className="languages-list-container my-4 columns-2 gap-4">
+      <div className={cn("languages-list-container my-4 gap-4",
+        languageList.length ? "columns-2" : "grid grid-cols-2"
+      )}>
         {(languageList.length) ? languageList.map((language, languageIndex) => {
           return (
             <LanguageItem

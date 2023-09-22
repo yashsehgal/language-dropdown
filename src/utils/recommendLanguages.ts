@@ -18,10 +18,10 @@ async function recommendLanguages() {
       }
     })
     .catch((error) => {
-      console.log("Error while fetching language recommendations", error);
+      console.error("Error while fetching language recommendations", error);
     });
   
-  console.log("Recommendations", recommendations);
+  console.info("Recommendations", recommendations);
   return recommendations;
 }
 
