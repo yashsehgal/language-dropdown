@@ -12,14 +12,15 @@
   @apply text-neutral-900;
 }
 
-body, html {
+body,
+html {
   @apply selection:bg-pink-600 selection:text-neutral-100;
 }
 
 * {
-  -ms-overflow-style: none;  /* Internet Explorer 10+ */
-  scrollbar-width: none;  /* Firefox */
+  -ms-overflow-style: none; /* Internet Explorer 10+ */
+  scrollbar-width: none; /* Firefox */
 }
-*::-webkit-scrollbar { 
-  display: none;  /* Safari and Chrome */
+*::-webkit-scrollbar {
+  display: none; /* Safari and Chrome */
 }

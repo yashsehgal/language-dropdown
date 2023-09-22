@@ -1,4 +1,4 @@
-import axios from "axios";
+import axios from 'axios';
 
 async function recommendLanguages() {
   let config = {
@@ -9,7 +9,8 @@ async function recommendLanguages() {
 
   let recommendations: string[] = [];
 
-  await axios.request(config)
+  await axios
+    .request(config)
     .then((response) => {
       if (response.data.items) {
         response.data.items.map((recommendation: any) => {
@@ -18,13 +19,11 @@ async function recommendLanguages() {
       }
     })
     .catch((error) => {
-      console.error("Error while fetching language recommendations", error);
+      console.error('Error while fetching language recommendations', error);
     });
-  
-  console.info("Recommendations", recommendations);
+
+  console.info('Recommendations', recommendations);
   return recommendations;
 }
 
-export {
-  recommendLanguages
-}
+export { recommendLanguages };

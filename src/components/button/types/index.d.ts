@@ -1,6 +1,7 @@
-import { ReactNode } from "react";
+import { ReactNode } from 'react';
 
-declare interface ButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
-  variant?: "Solid" | "Outline";
+declare interface ButtonProps
+  extends React.ButtonHTMLAttributes<HTMLButtonElement> {
+  variant?: 'Solid' | 'Outline';
   leadingIcon?: ReactNode;
-};
+}
