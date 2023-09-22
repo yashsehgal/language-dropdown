@@ -9,7 +9,7 @@ import { GripVertical, X } from "lucide-react";
 
 import Skeleton from 'react-loading-skeleton';
 
-import { fetchLanguageList, updateLanguageItemRemovalOnFirebase, updateLanguageList } from "../../utils/updateFirebase";
+import { fetchLanguageList, updateLanguageItemRemovalOnFirebase, updateLanguageItemReorderOnFirebase, updateLanguageList } from "../../utils/updateFirebase";
 import { cn } from "../../utils/cn";
 
 const LanguageDropdown = () => {
@@ -69,6 +69,16 @@ const LanguageDropdown = () => {
     // switching the positions of dragged item 
     // and the item where it is dropped
     _languageList.splice(dragOverItem.current, 0, draggedItemsContent);
+
+    console.log("updated list after dnd", _languageList);
+
+    // Updating the reordered languageList on local UI & firebase.
+    _languageList.map((languageItem: LanguageItemDataType, languageIndex: number) => {
+      if (languageItem.position !== languageIndex) {
+        languageItem.position = languageIndex;
+        updateLanguageItemReorderOnFirebase(languageItem, languageItem.id as string);
+      }
+    });
 
     // Reseting references for later drag events
     dragItem.current = null;

@@ -1,4 +1,4 @@
-import { collection, addDoc, getDocs, deleteDoc, doc } from "firebase/firestore";
+import { collection, addDoc, getDocs, deleteDoc, doc, updateDoc, query, where } from "firebase/firestore";
 import { db } from '../firebase';
 
 const updateLanguageList = async (data: LanguageItemDataType) => {
@@ -34,4 +34,16 @@ const updateLanguageItemRemovalOnFirebase = async (documentID: string) => {
   await deleteDoc(doc(db, "user-languages", documentID));
 };
 
-export { updateLanguageList, fetchLanguageList, updateLanguageItemRemovalOnFirebase };
+const updateLanguageItemReorderOnFirebase = async (data: LanguageItemDataType, documentId: string) => {
+  await updateDoc(
+    doc(db, "user-languages", documentId),
+    data
+  )
+}
+
+export {
+  updateLanguageList,
+  fetchLanguageList,
+  updateLanguageItemRemovalOnFirebase,
+  updateLanguageItemReorderOnFirebase
+};
