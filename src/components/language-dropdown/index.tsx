@@ -19,22 +19,14 @@ const LanguageDropdown = () => {
   const [newLanguageInput, setNewLanguageInput] = useState<string>("");
   // to manage the state with there's no data from firebase and local array.
   const [hasNoData, setHasNoData] = useState<boolean>(true);
-  // to manage the open state for combobox-select component
-  const [open, setOpen] = useState<boolean>(false);
-
-  // to manage the language/frameworks recommendations
-  const [recommendations, setRecommendations] = useState<LanguageRecommendationType[]>([
-    {
-      value: "React",
-      label: "React"
-    }
-  ]);
 
   // Method to manage the input changes in the newLanguage flow
   const handleNewLanguageInput = (inputString: string) => {
     setNewLanguageInput(inputString);
   };
 
+  // To manage the preload when the UI renders
+  // Fetches data from firebase...
   useEffect(() => {
     (async () => {
       let _preloadLanguageListData = await fetchLanguageList();
@@ -43,6 +35,9 @@ const LanguageDropdown = () => {
     })();
   }, []);
 
+  // Method to set the placeholders state
+  // - Has data but loading → show skeleton loading
+  // - Has no data still loading → show empty list text
   const reloadLanguageList = async () => {
     let _preloadLanguageListData = await fetchLanguageList();
     if (_preloadLanguageListData.length === 0) {
@@ -51,6 +46,9 @@ const LanguageDropdown = () => {
     setLanguageList(_preloadLanguageListData);
   };
 
+  // Works in sync with the above method {reloadLanguageList}
+  // Checks if the languageList is empty, 
+  // if yes → show empty list text
   useEffect(() => {
     if (!languageList) setHasNoData(true);
   }, [languageList]);
@@ -59,7 +57,7 @@ const LanguageDropdown = () => {
   const dragItem = useRef<any>(null);
   const dragOverItem = useRef<any>(null);
 
-  // method to handle sorting while dragging events
+  // method to handle sorting while dragging is ending;
   const handleLanguageItemsRearrange = () => {
     // Copying the languageItems list
     let _languageList = [...languageList];
@@ -72,13 +70,12 @@ const LanguageDropdown = () => {
     // and the item where it is dropped
     _languageList.splice(dragOverItem.current, 0, draggedItemsContent);
 
-    // reset the list
+    // Reseting references for later drag events
     dragItem.current = null;
     dragOverItem.current = null;
 
     // refresh the main languageList
     setLanguageList(_languageList);
-
   }
 
   return (
@@ -112,6 +109,7 @@ const LanguageDropdown = () => {
                 <Button
                   variant="Outline"
                   onClick={() => {
+                    // Reseting states for next time...
                     reloadLanguageList();
                     setNewLanguageInput("");
                   }}
@@ -147,7 +145,7 @@ const LanguageDropdown = () => {
           </DialogContent>
         </Dialog>
       </div >
-      <div className="languages-list-container my-4 grid grid-cols-1 gap-4">
+      <div className="languages-list-container my-4 columns-2 gap-4">
         {(languageList.length) ? languageList.map((language, languageIndex) => {
           return (
             <LanguageItem
@@ -156,10 +154,11 @@ const LanguageDropdown = () => {
               setLanguageList={setLanguageList}
               key={languageIndex}
               draggable
-              onDragStart={(e) => dragItem.current = languageIndex}
-              onDragEnter={(e) => dragOverItem.current = languageIndex}
+              onDragStart={() => dragItem.current = languageIndex}
+              onDragEnter={() => dragOverItem.current = languageIndex}
               onDragEnd={handleLanguageItemsRearrange}
               onDragOver={(e) => {
+                // This will manage the state change after the drag event is over.
                 e.preventDefault();
               }}
             />
@@ -200,7 +199,7 @@ const LanguageItem: React.FunctionComponent<LanguageItemProps & React.HTMLAttrib
   };
 
   return (
-    <div className="language-item p-4 shadow-lg rounded-lg bg-gradient-to-t from-neutral-900 to-neutral-700 flex flex-row items-center justify-between"
+    <div className="mb-4 language-item p-4 shadow-lg rounded-lg bg-gradient-to-t from-neutral-900 to-neutral-700 flex flex-row items-center justify-between"
       {...props}
     >
       <div className="language-item-content-wrapper font-medium text-lg text-neutral-100">
