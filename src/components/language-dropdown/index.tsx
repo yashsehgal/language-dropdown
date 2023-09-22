@@ -51,6 +51,11 @@ const LanguageDropdown = () => {
   // if yes → show empty list text
   useEffect(() => {
     if (!languageList) setHasNoData(true);
+    (async () => {
+      let _preloadLanguageListData = await fetchLanguageList();
+      setLanguageList(_preloadLanguageListData);
+      setHasNoData(false);
+    })();
   }, [languageList]);
 
   // References for the dragged item and item to replace with
@@ -58,7 +63,7 @@ const LanguageDropdown = () => {
   const dragOverItem = useRef<any>(null);
 
   // method to handle sorting while dragging is ending;
-  const handleLanguageItemsRearrange = () => {
+  const handleLanguageItemsRearrange = (e: React.DragEvent<HTMLDivElement>) => {
     // Copying the languageItems list
     let _languageList = [...languageList];
 
@@ -69,8 +74,6 @@ const LanguageDropdown = () => {
     // switching the positions of dragged item 
     // and the item where it is dropped
     _languageList.splice(dragOverItem.current, 0, draggedItemsContent);
-
-    console.log("updated list after dnd", _languageList);
 
     // Updating the reordered languageList on local UI & firebase.
     _languageList.map((languageItem: LanguageItemDataType, languageIndex: number) => {
@@ -86,6 +89,8 @@ const LanguageDropdown = () => {
 
     // refresh the main languageList
     setLanguageList(_languageList);
+
+    e.preventDefault();
   }
 
   return (
