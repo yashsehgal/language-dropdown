@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react"
+import React, { useEffect, useRef, useState } from "react"
 
 import Button from "../button";
 import { Label } from "../label";
@@ -54,6 +54,32 @@ const LanguageDropdown = () => {
   useEffect(() => {
     if (!languageList) setHasNoData(true);
   }, [languageList]);
+
+  // References for the dragged item and item to replace with
+  const dragItem = useRef<any>(null);
+  const dragOverItem = useRef<any>(null);
+
+  // method to handle sorting while dragging events
+  const handleLanguageItemsRearrange = () => {
+    // Copying the languageItems list
+    let _languageList = [...languageList];
+
+    // remove and save the dragged languageItem
+    const draggedItemsContent = _languageList.splice(
+      dragItem.current, 1)[0];
+
+    // switching the positions of dragged item 
+    // and the item where it is dropped
+    _languageList.splice(dragOverItem.current, 0, draggedItemsContent);
+
+    // reset the list
+    dragItem.current = null;
+    dragOverItem.current = null;
+
+    // refresh the main languageList
+    setLanguageList(_languageList);
+
+  }
 
   return (
     <div className="w-[820px] h-auto rounded-lg border border-neutral-200 p-4">
@@ -121,7 +147,7 @@ const LanguageDropdown = () => {
           </DialogContent>
         </Dialog>
       </div >
-      <div className="languages-list-container my-4 grid grid-cols-2 gap-4">
+      <div className="languages-list-container my-4 grid grid-cols-1 gap-4">
         {(languageList.length) ? languageList.map((language, languageIndex) => {
           return (
             <LanguageItem
@@ -129,6 +155,13 @@ const LanguageDropdown = () => {
               languageList={languageList}
               setLanguageList={setLanguageList}
               key={languageIndex}
+              draggable
+              onDragStart={(e) => dragItem.current = languageIndex}
+              onDragEnter={(e) => dragOverItem.current = languageIndex}
+              onDragEnd={handleLanguageItemsRearrange}
+              onDragOver={(e) => {
+                e.preventDefault();
+              }}
             />
           )
         }) : (
@@ -145,7 +178,7 @@ const LanguageDropdown = () => {
   )
 };
 
-const LanguageItem: React.FunctionComponent<LanguageItemProps> = ({ data, languageList, setLanguageList }) => {
+const LanguageItem: React.FunctionComponent<LanguageItemProps & React.HTMLAttributes<HTMLDivElement>> = ({ data, languageList, setLanguageList, ...props }) => {
   // Method to remove a language item from the list.
   const handleLanguageItemRemoval = (position: number) => {
     // Copy of the languageList array
@@ -168,7 +201,7 @@ const LanguageItem: React.FunctionComponent<LanguageItemProps> = ({ data, langua
 
   return (
     <div className="language-item p-4 shadow-lg rounded-lg bg-gradient-to-t from-neutral-900 to-neutral-700 flex flex-row items-center justify-between"
-      draggable
+      {...props}
     >
       <div className="language-item-content-wrapper font-medium text-lg text-neutral-100">
         {data.title}
