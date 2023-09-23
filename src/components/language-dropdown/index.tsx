@@ -10,6 +10,7 @@ import React, { useEffect, useRef, useState } from 'react';
 
 import Button from '../button';
 import { Label } from '../label';
+import { Input } from '../input';
 import {
   Dialog,
   DialogContent,
@@ -17,8 +18,6 @@ import {
   DialogTitle,
   DialogTrigger,
 } from '../dialog';
-
-import Select from 'react-select';
 
 import { GripVertical, X } from 'lucide-react';
 
@@ -47,6 +46,7 @@ const LanguageDropdown = () => {
   // Method to manage the input changes in the newLanguage flow
   const handleNewLanguageInput = async (inputString: string) => {
     // when the input string is null, reset all the language recommendations
+    if (!inputString) setRecommendations([]);
     setNewLanguageInput(inputString);
     // Rendering recommendations...
     handleRecommendations(inputString);
@@ -57,21 +57,27 @@ const LanguageDropdown = () => {
     // Do nothing when the new input string of language is empty.
     if (!newLanguageInput) return;
     // If not, then fetch & filter the recommendations
-    let _recommendations: RecommendationType[]
-      = (await recommendLanguages(inputString.toLowerCase() as string)) as any;
+    let _recommendations: RecommendationType[] = (await recommendLanguages(inputString)) as any;
+    _recommendations = await _recommendations.filter((languageItem: RecommendationType) => {
+      if (
+        languageItem.label.includes(newLanguageInput) ||
+        languageItem.label.startsWith(newLanguageInput)
+      ) {
+        return languageItem;
+      }
+    });
     setRecommendations(_recommendations);
   };
 
   // To manage the preload when the UI renders
   // Fetches data from firebase...
-  // useEffect(() => {
-  //   (async () => {
-  //     let _preloadLanguageListData = await fetchLanguageList();
-  //     setLanguageList(_preloadLanguageListData);
-  //     setHasNoData(false);
-  //     console.log("loading preloading function from firebase.firestore");
-  //   })();
-  // }, []);
+  useEffect(() => {
+    (async () => {
+      let _preloadLanguageListData = await fetchLanguageList();
+      setLanguageList(_preloadLanguageListData);
+      setHasNoData(false);
+    })();
+  }, []);
 
   // Method to set the placeholders state
   // - Has data but loading → show skeleton loading
@@ -83,6 +89,18 @@ const LanguageDropdown = () => {
     }
     setLanguageList(_preloadLanguageListData);
   };
+
+  // Works in sync with the above method {reloadLanguageList}
+  // Checks if the languageList is empty,
+  // if yes → show empty list text
+  useEffect(() => {
+    if (!languageList) setHasNoData(true);
+    (async () => {
+      let _preloadLanguageListData = await fetchLanguageList();
+      setLanguageList(_preloadLanguageListData);
+      setHasNoData(false);
+    })();
+  }, [languageList]);
 
   // References for the dragged item and item to replace with
   const dragItem = useRef<any>(null);
@@ -143,21 +161,15 @@ const LanguageDropdown = () => {
             <div className="dialog-content-body">
               <div className="language-name-input-wrapper">
                 <Label htmlFor="new-language-name">Language name</Label>
-                {/* <Input
+                <Input
                   id="new-language-name"
                   type="text"
                   placeholder="Javascript, Python, NodeJS..."
                   className="mt-2"
                   value={newLanguageInput}
-                /> */}
-                <Select
-                  options={recommendations}
-                  isClearable
-                  onInputChange={(inputValue) => {
-                    // Updating the new languageInput...
-                    // This will call the recommendation API for select as well.
-                    handleNewLanguageInput(inputValue as string);
-                  }}
+                  onChange={(e) =>
+                    handleNewLanguageInput(e.target.value as string)
+                  }
                 />
               </div>
             </div>
