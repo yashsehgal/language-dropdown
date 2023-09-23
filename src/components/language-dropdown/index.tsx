@@ -1,8 +1,6 @@
 /**
  *
- * TODO: Update current input component with react-select
  * TODO: Remove filter and apply controlled API calls for language recommendations
- * TODO: Make the change to 10 slots as shown in the GIF
  * TODO: Fix constantly happening API calls to firebase.firestore
  */
 
@@ -22,8 +20,6 @@ import {
 import Select from 'react-select';
 
 import { GripVertical, X } from 'lucide-react';
-
-import Skeleton from 'react-loading-skeleton';
 
 import {
   fetchLanguageList,
@@ -54,19 +50,23 @@ const LanguageDropdown = () => {
       : [],
   );
 
+  // Temporary inputValue handler
+  const [tempLanguageInput, setTempLanguageInput] = useState<string>("");
+
   // Method to manage the input changes in the newLanguage flow
   const handleNewLanguageInput = (inputString: any) => {
     setNewLanguageInput(inputString);
   };
 
   // Blocking API requests as the time-limit is exceeding...
-  // useEffect(() => {
-  //   // Rendering recommendations...
-  //   handleRecommendations(newLanguageInput);
-  // }, [newLanguageInput])
+  useEffect(() => {
+    // Rendering recommendations...
+    handleRecommendations(newLanguageInput);
+  }, [newLanguageInput])
 
   // To handle the recommendations
   const handleRecommendations = async (inputString: string = '') => {
+    if (inputString) setTempLanguageInput(inputString);
     // Do nothing when the new input string of language is empty.
     if (!newLanguageInput) return;
     // If not, then fetch & filter the recommendations
@@ -163,6 +163,13 @@ const LanguageDropdown = () => {
     e.preventDefault();
   };
 
+  // selected option from react-select
+  const handleSelection = (selectedOption: any) => {
+    if (!selectedOption.value && !selectedOption.label) return;
+    console.log("selected", selectedOption);
+    setNewLanguageInput(selectedOption.value as string);
+  };
+
   return (
     <div className="w-[820px] h-auto rounded-lg border border-neutral-200 p-4 shadow-inner shadow-neutral-200/60">
       <div className="flex flex-row items-center justify-between">
@@ -180,32 +187,32 @@ const LanguageDropdown = () => {
         )}>
         {languageList.length
           ? languageList.map((language, languageIndex) => {
-              return (
-                <LanguageItem
-                  data={language}
-                  languageList={languageList}
-                  setLanguageList={setLanguageList}
-                  // Sending placeholder list...
-                  placeholderList={placeholderList}
-                  setPlaceholderList={setLanguageList}
-                  key={languageIndex}
-                  draggable
-                  onDragStart={() => (dragItem.current = languageIndex)}
-                  onDragEnter={() => (dragOverItem.current = languageIndex)}
-                  onDragEnd={handleLanguageItemsRearrange}
-                  onDragOver={(e) => {
-                    // This will manage the state change after the drag event is over.
-                    e.preventDefault();
-                  }}
-                />
-              );
-            })
+            return (
+              <LanguageItem
+                data={language}
+                languageList={languageList}
+                setLanguageList={setLanguageList}
+                // Sending placeholder list...
+                placeholderList={placeholderList}
+                setPlaceholderList={setLanguageList}
+                key={languageIndex}
+                draggable
+                onDragStart={() => (dragItem.current = languageIndex)}
+                onDragEnter={() => (dragOverItem.current = languageIndex)}
+                onDragEnd={handleLanguageItemsRearrange}
+                onDragOver={(e) => {
+                  // This will manage the state change after the drag event is over.
+                  e.preventDefault();
+                }}
+              />
+            );
+          })
           : hasNoData && (
-              <>
-                {/* <Skeleton containerClassName="w-full" height={'73px'} />
+            <>
+              {/* <Skeleton containerClassName="w-full" height={'73px'} />
           <Skeleton containerClassName="w-full" height={'73px'} /> */}
-              </>
-            )}
+            </>
+          )}
         {/* Rendering add more languages block */}
         {languageList.length !== 10 && (
           <Dialog>
@@ -234,7 +241,25 @@ const LanguageDropdown = () => {
                     onChange={(e) =>
                       handleNewLanguageInput(e.target.value as string)
                     }
+                    list="language-recommendations"
                   />
+                  <datalist id="language-recommendations">
+                    {recommendations.map((recommendation, recommendationIndex) => {
+                      return (
+                        <option value={recommendation.value} key={recommendationIndex}>
+                          {recommendation.value}
+                        </option>
+                      )
+                    })}
+                  </datalist>
+                  {/* <Select
+                    options={recommendations}
+                    onInputChange={(inputValue) => {
+                      // Rendering recommendations...
+                      handleNewLanguageInput(inputValue as string);
+                    }}
+                    onChange={handleSelection}
+                  /> */}
                 </div>
               </div>
               <div className="flex flex-row items-center justify-end gap-2">
@@ -270,8 +295,8 @@ const LanguageDropdown = () => {
                       });
 
                       // Reseting the new input language data for later...
-                      setNewLanguageInput('');
                       setRecommendations([]);
+                      setNewLanguageInput('');
                     }}>
                     Save language
                   </Button>
@@ -297,7 +322,7 @@ const LanguageDropdown = () => {
           }
         })}
       </div>
-    </div>
+    </div >
   );
 };
 
@@ -311,46 +336,46 @@ const LanguageItem: React.FunctionComponent<
   setPlaceholderList,
   ...props
 }) => {
-  // Method to remove a language item from the list.
-  const handleLanguageItemRemoval = (position: number) => {
-    // Copy of the languageList array
-    // @ts-ignore
-    let _languageList: LanguageItemDataType[] = [...languageList];
-    // Filtering the copy array for the languageItem removal at "position"
-    _languageList = _languageList.filter(
-      (languageItem: LanguageItemDataType, languageIndex) => {
-        if (languageIndex !== position) {
-          return languageItem;
-        }
-      },
-    );
-    // After the removal of languageItem at position, we have to traverse
-    // and replace the positions with new locations (i.e. "currentLocations" - 1).
-    _languageList.map((languageItem, languageIndex) => {
-      languageItem.position = languageIndex;
-    });
-    setLanguageList(_languageList);
-    updateLanguageItemRemovalOnFirebase(data.id as string);
-  };
+    // Method to remove a language item from the list.
+    const handleLanguageItemRemoval = (position: number) => {
+      // Copy of the languageList array
+      // @ts-ignore
+      let _languageList: LanguageItemDataType[] = [...languageList];
+      // Filtering the copy array for the languageItem removal at "position"
+      _languageList = _languageList.filter(
+        (languageItem: LanguageItemDataType, languageIndex) => {
+          if (languageIndex !== position) {
+            return languageItem;
+          }
+        },
+      );
+      // After the removal of languageItem at position, we have to traverse
+      // and replace the positions with new locations (i.e. "currentLocations" - 1).
+      _languageList.map((languageItem, languageIndex) => {
+        languageItem.position = languageIndex;
+      });
+      setLanguageList(_languageList);
+      updateLanguageItemRemovalOnFirebase(data.id as string);
+    };
 
-  return (
-    <div
-      className="mb-4 language-item p-4 shadow-2xl rounded-lg bg-gradient-to-t from-neutral-900 to-neutral-700 flex flex-row items-center justify-between"
-      {...props}>
-      <div className="language-item-content-wrapper font-medium text-lg text-neutral-100">
-        {data.title}
+    return (
+      <div
+        className="mb-4 language-item p-4 shadow-2xl rounded-lg bg-gradient-to-t from-neutral-900 to-neutral-700 flex flex-row items-center justify-between"
+        {...props}>
+        <div className="language-item-content-wrapper font-medium text-lg text-neutral-100">
+          {data.title}
+        </div>
+        <div className="flex flex-row items-center justify-end gap-2">
+          <GripVertical color="rgb(163 163 163)" className="cursor-grab" />
+          <Button
+            variant="Outline"
+            className="p-2 bg-neutral-700 border-transparent hover:bg-neutral-700/60"
+            onClick={() => handleLanguageItemRemoval(data.position)}>
+            <X color="rgb(163 163 163)" />
+          </Button>
+        </div>
       </div>
-      <div className="flex flex-row items-center justify-end gap-2">
-        <GripVertical color="rgb(163 163 163)" className="cursor-grab" />
-        <Button
-          variant="Outline"
-          className="p-2 bg-neutral-700 border-transparent hover:bg-neutral-700/60"
-          onClick={() => handleLanguageItemRemoval(data.position)}>
-          <X color="rgb(163 163 163)" />
-        </Button>
-      </div>
-    </div>
-  );
-};
+    );
+  };
 
 export default LanguageDropdown;
