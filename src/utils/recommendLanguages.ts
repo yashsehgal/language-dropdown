@@ -1,20 +1,27 @@
 import axios from 'axios';
 
-async function recommendLanguages() {
+async function recommendLanguages(languageParam: string) {
   let config = {
     method: 'get',
     maxBodyLength: Infinity,
-    url: `https://api.stackexchange.com/2.3/tags?&order=desc&sort=popular&site=stackoverflow`,
+    url: `https://api.stackexchange.com/2.3/tags?&order=desc&sort=popular&site=stackoverflow${
+      languageParam && `&inname=${languageParam}`
+    }`,
   };
 
-  let recommendations: string[] = [];
+  console.log('API getting triggered');
+
+  let recommendations: RecommendationType[] = [];
 
   await axios
     .request(config)
-    .then((response) => {
+    .then((response: any) => {
       if (response.data.items) {
         response.data.items.map((recommendation: any) => {
-          recommendations.push(recommendation.name);
+          recommendations.push({
+            label: recommendation.name,
+            value: recommendation.name,
+          });
         });
       }
     })

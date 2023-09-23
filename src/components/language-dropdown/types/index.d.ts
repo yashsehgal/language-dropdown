@@ -9,7 +9,7 @@ declare interface LanguageItemProps {
   setLanguageList?: any;
 }
 
-declare type LanguageRecommendationType = {
-  value: string;
+declare type RecommendationType = {
   label: string;
+  value: string;
 };

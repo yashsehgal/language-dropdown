@@ -1,8 +1,15 @@
+/**
+ * 
+ * TODO: Update current input component with react-select
+ * TODO: Remove filter and apply controlled API calls for language recommendations
+ * TODO: Make the change to 10 slots as shown in the GIF
+ * TODO: Fix constantly happening API calls to firebase.firestore
+ */
+
 import React, { useEffect, useRef, useState } from 'react';
 
 import Button from '../button';
 import { Label } from '../label';
-import { Input } from '../input';
 import {
   Dialog,
   DialogContent,
@@ -10,6 +17,8 @@ import {
   DialogTitle,
   DialogTrigger,
 } from '../dialog';
+
+import Select from 'react-select';
 
 import { GripVertical, X } from 'lucide-react';
 
@@ -20,7 +29,7 @@ import {
   updateLanguageItemRemovalOnFirebase,
   updateLanguageItemReorderOnFirebase,
   updateLanguageList,
-} from '../../utils/updateFirebase';
+} from '../../utils/firebase-helpers';
 
 import { recommendLanguages } from '../../utils/recommendLanguages';
 import { cn } from '../../utils/cn';
@@ -33,43 +42,36 @@ const LanguageDropdown = () => {
   // to manage the state with there's no data from firebase and local array.
   const [hasNoData, setHasNoData] = useState<boolean>(true);
   // to manage the langauge recommendations array.
-  const [recommendations, setRecommendations] = useState<string[]>([]);
+  const [recommendations, setRecommendations] = useState<RecommendationType[]>([]);
 
   // Method to manage the input changes in the newLanguage flow
   const handleNewLanguageInput = async (inputString: string) => {
     // when the input string is null, reset all the language recommendations
-    if (!inputString) setRecommendations([]);
     setNewLanguageInput(inputString);
     // Rendering recommendations...
-    handleRecommendations();
+    handleRecommendations(inputString);
   };
 
   // To handle the recommendations
-  const handleRecommendations = async () => {
+  const handleRecommendations = async (inputString: string = "") => {
     // Do nothing when the new input string of language is empty.
     if (!newLanguageInput) return;
     // If not, then fetch & filter the recommendations
-    let _recommendations: string[] = (await recommendLanguages()) as any;
-    _recommendations = await _recommendations.filter((languageItem: string) => {
-      if (
-        languageItem.includes(newLanguageInput) ||
-        languageItem.startsWith(newLanguageInput)
-      ) {
-        return languageItem;
-      }
-    });
+    let _recommendations: RecommendationType[]
+      = (await recommendLanguages(inputString.toLowerCase() as string)) as any;
     setRecommendations(_recommendations);
   };
 
   // To manage the preload when the UI renders
   // Fetches data from firebase...
-  useEffect(() => {
-    (async () => {
-      let _preloadLanguageListData = await fetchLanguageList();
-      setLanguageList(_preloadLanguageListData);
-      setHasNoData(false);
-    })();
-  }, []);
+  // useEffect(() => {
+  //   (async () => {
+  //     let _preloadLanguageListData = await fetchLanguageList();
+  //     setLanguageList(_preloadLanguageListData);
+  //     setHasNoData(false);
+  //     console.log("loading preloading function from firebase.firestore");
+  //   })();
+  // }, []);
 
   // Method to set the placeholders state
   // - Has data but loading → show skeleton loading
@@ -81,18 +83,6 @@ const LanguageDropdown = () => {
     }
     setLanguageList(_preloadLanguageListData);
   };
-
-  // Works in sync with the above method {reloadLanguageList}
-  // Checks if the languageList is empty,
-  // if yes → show empty list text
-  useEffect(() => {
-    if (!languageList) setHasNoData(true);
-    (async () => {
-      let _preloadLanguageListData = await fetchLanguageList();
-      setLanguageList(_preloadLanguageListData);
-      setHasNoData(false);
-    })();
-  }, [languageList]);
 
   // References for the dragged item and item to replace with
   const dragItem = useRef<any>(null);
@@ -153,33 +143,24 @@ const LanguageDropdown = () => {
             <div className="dialog-content-body">
               <div className="language-name-input-wrapper">
                 <Label htmlFor="new-language-name">Language name</Label>
-                <Input
+                {/* <Input
                   id="new-language-name"
                   type="text"
                   placeholder="Javascript, Python, NodeJS..."
                   className="mt-2"
                   value={newLanguageInput}
-                  onChange={(e) =>
-                    handleNewLanguageInput(e.target.value as string)
-                  }
+                /> */}
+                <Select
+                  options={recommendations}
+                  isClearable
+                  onInputChange={(inputValue) => {
+                    // Updating the new languageInput...
+                    // This will call the recommendation API for select as well.
+                    handleNewLanguageInput(inputValue as string);
+                  }}
                 />
               </div>
             </div>
-            {recommendations.length >= 0 && (
-              <div className="overflow-y-scroll min-h-fit h-fit max-h-[240px] w-full grid grid-cols-1 gap-2">
-                {recommendations?.map((recommendation, recommendationIndex) => {
-                  return (
-                    <Button
-                      variant="Outline"
-                      className="text-xs truncate w-full h-fit"
-                      onClick={() => setNewLanguageInput(recommendation)}
-                      key={recommendationIndex}>
-                      {recommendation}
-                    </Button>
-                  );
-                })}
-              </div>
-            )}
             <div className="flex flex-row items-center justify-end gap-2">
               <DialogTrigger asChild>
                 <Button
