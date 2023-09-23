@@ -19,6 +19,8 @@ import {
   DialogTrigger,
 } from '../dialog';
 
+import Select from 'react-select';
+
 import { GripVertical, X } from 'lucide-react';
 
 import Skeleton from 'react-loading-skeleton';
@@ -44,13 +46,15 @@ const LanguageDropdown = () => {
   const [recommendations, setRecommendations] = useState<RecommendationType[]>([]);
 
   // Method to manage the input changes in the newLanguage flow
-  const handleNewLanguageInput = async (inputString: string) => {
-    // when the input string is null, reset all the language recommendations
-    if (!inputString) setRecommendations([]);
+  const handleNewLanguageInput = (inputString: any) => {
     setNewLanguageInput(inputString);
-    // Rendering recommendations...
-    handleRecommendations(inputString);
   };
+
+  // Blocking API requests as the time-limit is exceeding...
+  // useEffect(() => {
+  //   // Rendering recommendations...
+  //   handleRecommendations(newLanguageInput);
+  // }, [newLanguageInput])
 
   // To handle the recommendations
   const handleRecommendations = async (inputString: string = "") => {
@@ -176,18 +180,13 @@ const LanguageDropdown = () => {
               />
             );
           })
-        ) : !hasNoData ? (
-          <div className="text-center select-none my-2 text-neutral-400">
-            No data found. Start adding languages in your skills
-          </div>
-        ) : (
-          <>
-            <Skeleton containerClassName="w-full" height={'73px'} />
-            <Skeleton containerClassName="w-full" height={'73px'} />
-          </>
-        )}
+        ) : hasNoData && <>
+          <Skeleton containerClassName="w-full" height={'73px'} />
+          <Skeleton containerClassName="w-full" height={'73px'} />
+        </>
+        }
         {/* Rendering add more languages block */}
-        {true && <Dialog>
+        {(languageList.length !== 10) && <Dialog>
           <DialogTrigger asChild>
             <Button
               variant='Solid'
