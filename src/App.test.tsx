@@ -1,4 +1,4 @@
-import { screen } from '@testing-library/dom'
+import { screen } from '@testing-library/dom';
 
 test('Check for Headline in the page header', () => {
   document.body.innerHTML = `

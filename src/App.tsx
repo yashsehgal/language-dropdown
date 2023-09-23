@@ -8,15 +8,13 @@ const App: React.FunctionComponent = () => {
           className="leading-snug tracking-tighter font-medium text-4xl"
           aria-description="Manage your skills"
           aria-label="Headline: Manage your skills"
-          data-testid="page-headline"
-        >
+          data-testid="page-headline">
           {'Manage your skills'}
         </h1>
         <h3
           className="leading-snug tracking-tighter font-normal text-xl text-neutral-500"
           title="Add the languages you know"
-          data-testid="page-description"
-        >
+          data-testid="page-description">
           {'Add Languages you know'}
         </h3>
       </main>

@@ -1,5 +1,5 @@
 /**
- * 
+ *
  * TODO: Update current input component with react-select
  * TODO: Remove filter and apply controlled API calls for language recommendations
  * TODO: Make the change to 10 slots as shown in the GIF
@@ -43,15 +43,16 @@ const LanguageDropdown = () => {
   // to manage the state with there's no data from firebase and local array.
   const [hasNoData, setHasNoData] = useState<boolean>(true);
   // to manage the langauge recommendations array.
-  const [recommendations, setRecommendations] = useState<RecommendationType[]>([]);
+  const [recommendations, setRecommendations] = useState<RecommendationType[]>(
+    [],
+  );
 
   // to manage the placeholder array in the list
-  const [placeholderList, setPlaceholderList]
-    = useState<string[]>(
-      (languageList.length !== 10 && languageList.length !== 9)
-        ? new Array(9 - languageList.length).fill("")
-        : []
-    );
+  const [placeholderList, setPlaceholderList] = useState<string[]>(
+    languageList.length !== 10 && languageList.length !== 9
+      ? new Array(9 - languageList.length).fill('')
+      : [],
+  );
 
   // Method to manage the input changes in the newLanguage flow
   const handleNewLanguageInput = (inputString: any) => {
@@ -65,19 +66,23 @@ const LanguageDropdown = () => {
   // }, [newLanguageInput])
 
   // To handle the recommendations
-  const handleRecommendations = async (inputString: string = "") => {
+  const handleRecommendations = async (inputString: string = '') => {
     // Do nothing when the new input string of language is empty.
     if (!newLanguageInput) return;
     // If not, then fetch & filter the recommendations
-    let _recommendations: RecommendationType[] = (await recommendLanguages(inputString)) as any;
-    _recommendations = await _recommendations.filter((languageItem: RecommendationType) => {
-      if (
-        languageItem.label.includes(newLanguageInput) ||
-        languageItem.label.startsWith(newLanguageInput)
-      ) {
-        return languageItem;
-      }
-    });
+    let _recommendations: RecommendationType[] = (await recommendLanguages(
+      inputString,
+    )) as any;
+    _recommendations = await _recommendations.filter(
+      (languageItem: RecommendationType) => {
+        if (
+          languageItem.label.includes(newLanguageInput) ||
+          languageItem.label.startsWith(newLanguageInput)
+        ) {
+          return languageItem;
+        }
+      },
+    );
     setRecommendations(_recommendations);
   };
 
@@ -91,7 +96,6 @@ const LanguageDropdown = () => {
     })();
   }, []);
 
-
   // Method to set the placeholders state
   // - Has data but loading → show skeleton loading
   // - Has no data still loading → show empty list text
@@ -101,7 +105,7 @@ const LanguageDropdown = () => {
       setHasNoData(true);
     }
     setLanguageList(_preloadLanguageListData);
-    setPlaceholderList(new Array(9 - languageList.length).fill(""))
+    setPlaceholderList(new Array(9 - languageList.length).fill(''));
   };
 
   // Works in sync with the above method {reloadLanguageList}
@@ -115,8 +119,8 @@ const LanguageDropdown = () => {
       setHasNoData(false);
     })();
     languageList.length !== 10
-      ? setPlaceholderList(new Array(9 - languageList.length).fill(""))
-      : setPlaceholderList([])
+      ? setPlaceholderList(new Array(9 - languageList.length).fill(''))
+      : setPlaceholderList([]);
   }, [languageList]);
 
   // References for the dragged item and item to replace with
@@ -172,127 +176,124 @@ const LanguageDropdown = () => {
         className={cn(
           'languages-list-container my-4 gap-4',
           // languageList.length ? 'columns-2' : 'grid grid-cols-2',
-          'columns-2'
+          'columns-2',
         )}>
-        {languageList.length ? (
-          languageList.map((language, languageIndex) => {
-            return (
-              <LanguageItem
-                data={language}
-                languageList={languageList}
-                setLanguageList={setLanguageList}
-                // Sending placeholder list...
-                placeholderList={placeholderList}
-                setPlaceholderList={setLanguageList}
-                key={languageIndex}
-                draggable
-                onDragStart={() => (dragItem.current = languageIndex)}
-                onDragEnter={() => (dragOverItem.current = languageIndex)}
-                onDragEnd={handleLanguageItemsRearrange}
-                onDragOver={(e) => {
-                  // This will manage the state change after the drag event is over.
-                  e.preventDefault();
-                }}
-              />
-            );
-          })
-        ) : hasNoData && <>
-          {/* <Skeleton containerClassName="w-full" height={'73px'} />
-          <Skeleton containerClassName="w-full" height={'73px'} /> */}
-        </>
-        }
-        {/* Rendering add more languages block */}
-        {(languageList.length !== 10) && <Dialog>
-          <DialogTrigger asChild>
-            <Button
-              variant='Solid'
-              className={
-                cn("mb-4 w-full h-[73px] p-4 shadow-2xl text-lg font-medium rounded-lg bg-gradient-to-t from-neutral-900 to-neutral-700 opacity-60 hover:opacity-70 flex flex-row items-center justify-between",
-                )
-              }
-            >
-              Add language
-            </Button>
-          </DialogTrigger>
-          <DialogContent>
-            <DialogHeader>
-              <DialogTitle>Add new Language as skill</DialogTitle>
-            </DialogHeader>
-            <div className="dialog-content-body">
-              <div className="language-name-input-wrapper">
-                <Label htmlFor="new-language-name">Language name</Label>
-                <Input
-                  id="new-language-name"
-                  type="text"
-                  placeholder="Javascript, Python, NodeJS..."
-                  className="mt-2"
-                  value={newLanguageInput}
-                  onChange={(e) =>
-                    handleNewLanguageInput(e.target.value as string)
-                  }
+        {languageList.length
+          ? languageList.map((language, languageIndex) => {
+              return (
+                <LanguageItem
+                  data={language}
+                  languageList={languageList}
+                  setLanguageList={setLanguageList}
+                  // Sending placeholder list...
+                  placeholderList={placeholderList}
+                  setPlaceholderList={setLanguageList}
+                  key={languageIndex}
+                  draggable
+                  onDragStart={() => (dragItem.current = languageIndex)}
+                  onDragEnter={() => (dragOverItem.current = languageIndex)}
+                  onDragEnd={handleLanguageItemsRearrange}
+                  onDragOver={(e) => {
+                    // This will manage the state change after the drag event is over.
+                    e.preventDefault();
+                  }}
                 />
+              );
+            })
+          : hasNoData && (
+              <>
+                {/* <Skeleton containerClassName="w-full" height={'73px'} />
+          <Skeleton containerClassName="w-full" height={'73px'} /> */}
+              </>
+            )}
+        {/* Rendering add more languages block */}
+        {languageList.length !== 10 && (
+          <Dialog>
+            <DialogTrigger asChild>
+              <Button
+                variant="Solid"
+                className={cn(
+                  'mb-4 w-full h-[73px] p-4 shadow-2xl text-lg font-medium rounded-lg bg-gradient-to-t from-neutral-900 to-neutral-700 opacity-60 hover:opacity-70 flex flex-row items-center justify-between',
+                )}>
+                Add language
+              </Button>
+            </DialogTrigger>
+            <DialogContent>
+              <DialogHeader>
+                <DialogTitle>Add new Language as skill</DialogTitle>
+              </DialogHeader>
+              <div className="dialog-content-body">
+                <div className="language-name-input-wrapper">
+                  <Label htmlFor="new-language-name">Language name</Label>
+                  <Input
+                    id="new-language-name"
+                    type="text"
+                    placeholder="Javascript, Python, NodeJS..."
+                    className="mt-2"
+                    value={newLanguageInput}
+                    onChange={(e) =>
+                      handleNewLanguageInput(e.target.value as string)
+                    }
+                  />
+                </div>
               </div>
-            </div>
-            <div className="flex flex-row items-center justify-end gap-2">
-              <DialogTrigger asChild>
-                <Button
-                  variant="Outline"
-                  onClick={() => {
-                    // Reseting states for next time...
-                    reloadLanguageList();
-                    setNewLanguageInput('');
-                  }}>
-                  Discard
-                </Button>
-              </DialogTrigger>
-              <DialogTrigger asChild>
-                <Button
-                  className="w-fit"
-                  onClick={() => {
-                    // do nothing if no new language input is added
-                    if (!newLanguageInput) return;
-                    // if found input data for new language; update the languageList
-                    setLanguageList([
-                      ...languageList,
-                      {
+              <div className="flex flex-row items-center justify-end gap-2">
+                <DialogTrigger asChild>
+                  <Button
+                    variant="Outline"
+                    onClick={() => {
+                      // Reseting states for next time...
+                      reloadLanguageList();
+                      setNewLanguageInput('');
+                    }}>
+                    Discard
+                  </Button>
+                </DialogTrigger>
+                <DialogTrigger asChild>
+                  <Button
+                    className="w-fit"
+                    onClick={() => {
+                      // do nothing if no new language input is added
+                      if (!newLanguageInput) return;
+                      // if found input data for new language; update the languageList
+                      setLanguageList([
+                        ...languageList,
+                        {
+                          title: newLanguageInput,
+                          position: languageList.length,
+                        },
+                      ]);
+                      // updating the data on firebase > firestore
+                      updateLanguageList({
                         title: newLanguageInput,
                         position: languageList.length,
-                      },
-                    ]);
-                    // updating the data on firebase > firestore
-                    updateLanguageList({
-                      title: newLanguageInput,
-                      position: languageList.length,
-                    });
+                      });
 
-                    // Reseting the new input language data for later...
-                    setNewLanguageInput('');
-                    setRecommendations([]);
-                    // Removing a placeholder when language item is saved
-                    // setPlaceholderList(new Array(8 - languageList.length).fill(""))
-                  }}>
-                  Save language
-                </Button>
-              </DialogTrigger>
-            </div>
-          </DialogContent>
-        </Dialog>}
+                      // Reseting the new input language data for later...
+                      setNewLanguageInput('');
+                      setRecommendations([]);
+                    }}>
+                    Save language
+                  </Button>
+                </DialogTrigger>
+              </div>
+            </DialogContent>
+          </Dialog>
+        )}
         {placeholderList.map((placeholder, index) => {
           if (index >= 9) {
-            <>Invalid render</>
+            <>Invalid render</>;
           } else {
             return (
               <Button
-                variant='Solid'
-                className={
-                  cn("mb-4 w-full h-[73px] p-4 cursor-not-allowed shadow-2xl text-lg font-medium rounded-lg bg-gradient-to-t from-neutral-900 to-neutral-700 opacity-20 flex flex-row items-center justify-between",
-                  )
-                }
-                draggable
-              >
+                variant="Solid"
+                className={cn(
+                  'mb-4 w-full h-[73px] p-4 cursor-not-allowed shadow-2xl text-lg font-medium rounded-lg bg-gradient-to-t from-neutral-900 to-neutral-700 opacity-20 flex flex-row items-center justify-between',
+                )}
+                draggable>
                 Add language
               </Button>
-            )
+            );
           }
         })}
       </div>
@@ -302,7 +303,14 @@ const LanguageDropdown = () => {
 
 const LanguageItem: React.FunctionComponent<
   LanguageItemProps & React.HTMLAttributes<HTMLDivElement>
-> = ({ data, languageList, setLanguageList, placeholderList, setPlaceholderList, ...props }) => {
+> = ({
+  data,
+  languageList,
+  setLanguageList,
+  placeholderList,
+  setPlaceholderList,
+  ...props
+}) => {
   // Method to remove a language item from the list.
   const handleLanguageItemRemoval = (position: number) => {
     // Copy of the languageList array
