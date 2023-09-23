@@ -1,6 +1,5 @@
 /**
  *
- * TODO: Remove filter and apply controlled API calls for language recommendations
  * TODO: Fix constantly happening API calls to firebase.firestore
  */
 
@@ -17,8 +16,6 @@ import {
   DialogTrigger,
 } from '../dialog';
 
-import Select from 'react-select';
-
 import { GripVertical, X } from 'lucide-react';
 
 import {
@@ -30,6 +27,7 @@ import {
 
 import { recommendLanguages } from '../../utils/recommendLanguages';
 import { cn } from '../../utils/cn';
+import Skeleton from 'react-loading-skeleton';
 
 const LanguageDropdown = () => {
   // to store & manage the languages list
@@ -39,9 +37,7 @@ const LanguageDropdown = () => {
   // to manage the state with there's no data from firebase and local array.
   const [hasNoData, setHasNoData] = useState<boolean>(true);
   // to manage the langauge recommendations array.
-  const [recommendations, setRecommendations] = useState<RecommendationType[]>(
-    [],
-  );
+  const [recommendations, setRecommendations] = useState<RecommendationType[]>([]);
 
   // to manage the placeholder array in the list
   const [placeholderList, setPlaceholderList] = useState<string[]>(
@@ -49,9 +45,6 @@ const LanguageDropdown = () => {
       ? new Array(9 - languageList.length).fill('')
       : [],
   );
-
-  // Temporary inputValue handler
-  const [tempLanguageInput, setTempLanguageInput] = useState<string>("");
 
   // Method to manage the input changes in the newLanguage flow
   const handleNewLanguageInput = (inputString: any) => {
@@ -66,12 +59,11 @@ const LanguageDropdown = () => {
 
   // To handle the recommendations
   const handleRecommendations = async (inputString: string = '') => {
-    if (inputString) setTempLanguageInput(inputString);
     // Do nothing when the new input string of language is empty.
     if (!newLanguageInput) return;
     // If not, then fetch & filter the recommendations
     let _recommendations: RecommendationType[] = (await recommendLanguages(
-      inputString,
+      inputString.toLowerCase() as string,
     )) as any;
     _recommendations = await _recommendations.filter(
       (languageItem: RecommendationType) => {
@@ -112,12 +104,6 @@ const LanguageDropdown = () => {
   // Checks if the languageList is empty,
   // if yes → show empty list text
   useEffect(() => {
-    if (!languageList) setHasNoData(true);
-    (async () => {
-      let _preloadLanguageListData = await fetchLanguageList();
-      setLanguageList(_preloadLanguageListData);
-      setHasNoData(false);
-    })();
     languageList.length !== 10
       ? setPlaceholderList(new Array(9 - languageList.length).fill(''))
       : setPlaceholderList([]);
@@ -163,13 +149,6 @@ const LanguageDropdown = () => {
     e.preventDefault();
   };
 
-  // selected option from react-select
-  const handleSelection = (selectedOption: any) => {
-    if (!selectedOption.value && !selectedOption.label) return;
-    console.log("selected", selectedOption);
-    setNewLanguageInput(selectedOption.value as string);
-  };
-
   return (
     <div className="w-[820px] h-auto rounded-lg border border-neutral-200 p-4 shadow-inner shadow-neutral-200/60">
       <div className="flex flex-row items-center justify-between">
@@ -208,10 +187,7 @@ const LanguageDropdown = () => {
             );
           })
           : hasNoData && (
-            <>
-              {/* <Skeleton containerClassName="w-full" height={'73px'} />
-          <Skeleton containerClassName="w-full" height={'73px'} /> */}
-            </>
+            <></>
           )}
         {/* Rendering add more languages block */}
         {languageList.length !== 10 && (
@@ -252,14 +228,6 @@ const LanguageDropdown = () => {
                       )
                     })}
                   </datalist>
-                  {/* <Select
-                    options={recommendations}
-                    onInputChange={(inputValue) => {
-                      // Rendering recommendations...
-                      handleNewLanguageInput(inputValue as string);
-                    }}
-                    onChange={handleSelection}
-                  /> */}
                 </div>
               </div>
               <div className="flex flex-row items-center justify-end gap-2">
