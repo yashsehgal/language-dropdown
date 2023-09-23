@@ -143,16 +143,61 @@ const LanguageDropdown = () => {
   };
 
   return (
-    <div className="w-[820px] h-auto rounded-lg border border-neutral-200 p-4">
+    <div className="w-[820px] h-auto rounded-lg border border-neutral-200 p-4 shadow-inner shadow-neutral-200/60">
       <div className="flex flex-row items-center justify-between">
         <p className="leading-snug font-normal text-sm text-neutral-500 tracking-tight">
           {
             'The skills you mention here will help hackathon organizers in assessing you as a potential participant.'
           }
         </p>
-        <Dialog>
+      </div>
+      <div
+        className={cn(
+          'languages-list-container my-4 gap-4',
+          // languageList.length ? 'columns-2' : 'grid grid-cols-2',
+          'grid grid-cols-2'
+        )}>
+        {languageList.length ? (
+          languageList.map((language, languageIndex) => {
+            return (
+              <LanguageItem
+                data={language}
+                languageList={languageList}
+                setLanguageList={setLanguageList}
+                key={languageIndex}
+                draggable
+                onDragStart={() => (dragItem.current = languageIndex)}
+                onDragEnter={() => (dragOverItem.current = languageIndex)}
+                onDragEnd={handleLanguageItemsRearrange}
+                onDragOver={(e) => {
+                  // This will manage the state change after the drag event is over.
+                  e.preventDefault();
+                }}
+              />
+            );
+          })
+        ) : !hasNoData ? (
+          <div className="text-center select-none my-2 text-neutral-400">
+            No data found. Start adding languages in your skills
+          </div>
+        ) : (
+          <>
+            <Skeleton containerClassName="w-full" height={'73px'} />
+            <Skeleton containerClassName="w-full" height={'73px'} />
+          </>
+        )}
+        {/* Rendering add more languages block */}
+        {true && <Dialog>
           <DialogTrigger asChild>
-            <Button>Add language</Button>
+            <Button
+              variant='Solid'
+              className={
+                cn("p-4 shadow-2xl text-lg font-medium rounded-lg bg-gradient-to-t from-neutral-900 to-neutral-700 opacity-60 hover:opacity-70 flex flex-row items-center justify-between",
+                )
+              }
+            >
+              Add language
+            </Button>
           </DialogTrigger>
           <DialogContent>
             <DialogHeader>
@@ -214,42 +259,7 @@ const LanguageDropdown = () => {
               </DialogTrigger>
             </div>
           </DialogContent>
-        </Dialog>
-      </div>
-      <div
-        className={cn(
-          'languages-list-container my-4 gap-4',
-          languageList.length ? 'columns-2' : 'grid grid-cols-2',
-        )}>
-        {languageList.length ? (
-          languageList.map((language, languageIndex) => {
-            return (
-              <LanguageItem
-                data={language}
-                languageList={languageList}
-                setLanguageList={setLanguageList}
-                key={languageIndex}
-                draggable
-                onDragStart={() => (dragItem.current = languageIndex)}
-                onDragEnter={() => (dragOverItem.current = languageIndex)}
-                onDragEnd={handleLanguageItemsRearrange}
-                onDragOver={(e) => {
-                  // This will manage the state change after the drag event is over.
-                  e.preventDefault();
-                }}
-              />
-            );
-          })
-        ) : !hasNoData ? (
-          <div className="text-center select-none my-2 text-neutral-400">
-            No data found. Start adding languages in your skills
-          </div>
-        ) : (
-          <>
-            <Skeleton containerClassName="w-full" height={'73px'} />
-            <Skeleton containerClassName="w-full" height={'73px'} />
-          </>
-        )}
+        </Dialog>}
       </div>
     </div>
   );
@@ -282,7 +292,7 @@ const LanguageItem: React.FunctionComponent<
 
   return (
     <div
-      className="mb-4 language-item p-4 shadow-lg rounded-lg bg-gradient-to-t from-neutral-900 to-neutral-700 flex flex-row items-center justify-between"
+      className="language-item p-4 shadow-2xl rounded-lg bg-gradient-to-t from-neutral-900 to-neutral-700 flex flex-row items-center justify-between"
       {...props}>
       <div className="language-item-content-wrapper font-medium text-lg text-neutral-100">
         {data.title}
