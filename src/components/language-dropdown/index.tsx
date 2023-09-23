@@ -45,6 +45,10 @@ const LanguageDropdown = () => {
   // to manage the langauge recommendations array.
   const [recommendations, setRecommendations] = useState<RecommendationType[]>([]);
 
+  // to manage the placeholder array in the list
+  const [placeholderList, setPlaceholderList]
+    = useState<string[]>(new Array(9 - languageList.length).fill(""));
+
   // Method to manage the input changes in the newLanguage flow
   const handleNewLanguageInput = (inputString: any) => {
     setNewLanguageInput(inputString);
@@ -83,6 +87,7 @@ const LanguageDropdown = () => {
     })();
   }, []);
 
+
   // Method to set the placeholders state
   // - Has data but loading → show skeleton loading
   // - Has no data still loading → show empty list text
@@ -92,6 +97,7 @@ const LanguageDropdown = () => {
       setHasNoData(true);
     }
     setLanguageList(_preloadLanguageListData);
+    setPlaceholderList(new Array(9 - languageList.length).fill(""))
   };
 
   // Works in sync with the above method {reloadLanguageList}
@@ -104,6 +110,7 @@ const LanguageDropdown = () => {
       setLanguageList(_preloadLanguageListData);
       setHasNoData(false);
     })();
+    setPlaceholderList(new Array(9 - languageList.length).fill(""))
   }, [languageList]);
 
   // References for the dragged item and item to replace with
@@ -159,7 +166,7 @@ const LanguageDropdown = () => {
         className={cn(
           'languages-list-container my-4 gap-4',
           // languageList.length ? 'columns-2' : 'grid grid-cols-2',
-          'grid grid-cols-2'
+          'columns-2'
         )}>
         {languageList.length ? (
           languageList.map((language, languageIndex) => {
@@ -168,6 +175,9 @@ const LanguageDropdown = () => {
                 data={language}
                 languageList={languageList}
                 setLanguageList={setLanguageList}
+                // Sending placeholder list...
+                placeholderList={placeholderList}
+                setPlaceholderList={setLanguageList}
                 key={languageIndex}
                 draggable
                 onDragStart={() => (dragItem.current = languageIndex)}
@@ -181,8 +191,8 @@ const LanguageDropdown = () => {
             );
           })
         ) : hasNoData && <>
-          <Skeleton containerClassName="w-full" height={'73px'} />
-          <Skeleton containerClassName="w-full" height={'73px'} />
+          {/* <Skeleton containerClassName="w-full" height={'73px'} />
+          <Skeleton containerClassName="w-full" height={'73px'} /> */}
         </>
         }
         {/* Rendering add more languages block */}
@@ -191,7 +201,7 @@ const LanguageDropdown = () => {
             <Button
               variant='Solid'
               className={
-                cn("p-4 shadow-2xl text-lg font-medium rounded-lg bg-gradient-to-t from-neutral-900 to-neutral-700 opacity-60 hover:opacity-70 flex flex-row items-center justify-between",
+                cn("mb-4 w-full h-[73px] p-4 shadow-2xl text-lg font-medium rounded-lg bg-gradient-to-t from-neutral-900 to-neutral-700 opacity-60 hover:opacity-70 flex flex-row items-center justify-between",
                 )
               }
             >
@@ -252,6 +262,8 @@ const LanguageDropdown = () => {
                     // Reseting the new input language data for later...
                     setNewLanguageInput('');
                     setRecommendations([]);
+                    // Removing a placeholder when language item is saved
+                    setPlaceholderList(new Array(8 - languageList.length).fill(""))
                   }}>
                   Save language
                 </Button>
@@ -259,6 +271,24 @@ const LanguageDropdown = () => {
             </div>
           </DialogContent>
         </Dialog>}
+        {placeholderList.map((placeholder, index) => {
+          if (index >= 9) {
+            <>Invalid render</>
+          } else {
+            return (
+              <Button
+                variant='Solid'
+                className={
+                  cn("mb-4 w-full h-[73px] p-4 cursor-not-allowed shadow-2xl text-lg font-medium rounded-lg bg-gradient-to-t from-neutral-900 to-neutral-700 opacity-20 flex flex-row items-center justify-between",
+                  )
+                }
+                draggable
+              >
+                Add language
+              </Button>
+            )
+          }
+        })}
       </div>
     </div>
   );
@@ -266,7 +296,7 @@ const LanguageDropdown = () => {
 
 const LanguageItem: React.FunctionComponent<
   LanguageItemProps & React.HTMLAttributes<HTMLDivElement>
-> = ({ data, languageList, setLanguageList, ...props }) => {
+> = ({ data, languageList, setLanguageList, placeholderList, setPlaceholderList, ...props }) => {
   // Method to remove a language item from the list.
   const handleLanguageItemRemoval = (position: number) => {
     // Copy of the languageList array
@@ -291,7 +321,7 @@ const LanguageItem: React.FunctionComponent<
 
   return (
     <div
-      className="language-item p-4 shadow-2xl rounded-lg bg-gradient-to-t from-neutral-900 to-neutral-700 flex flex-row items-center justify-between"
+      className="mb-4 language-item p-4 shadow-2xl rounded-lg bg-gradient-to-t from-neutral-900 to-neutral-700 flex flex-row items-center justify-between"
       {...props}>
       <div className="language-item-content-wrapper font-medium text-lg text-neutral-100">
         {data.title}

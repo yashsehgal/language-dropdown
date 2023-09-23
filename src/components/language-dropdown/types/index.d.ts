@@ -7,6 +7,8 @@ declare interface LanguageItemProps {
   data: LanguageItemDataType;
   languageList?: LanguageItemDataType[];
   setLanguageList?: any;
+  placeholderList?: string[];
+  setPlaceholderList?: any;
 }
 
 declare type RecommendationType = {
