@@ -37,7 +37,9 @@ const LanguageDropdown = () => {
   // to manage the state with there's no data from firebase and local array.
   const [hasNoData, setHasNoData] = useState<boolean>(true);
   // to manage the langauge recommendations array.
-  const [recommendations, setRecommendations] = useState<RecommendationType[]>([]);
+  const [recommendations, setRecommendations] = useState<RecommendationType[]>(
+    [],
+  );
 
   // to manage the placeholder array in the list
   const [placeholderList, setPlaceholderList] = useState<string[]>(
@@ -55,7 +57,7 @@ const LanguageDropdown = () => {
   useEffect(() => {
     // Rendering recommendations...
     handleRecommendations(newLanguageInput);
-  }, [newLanguageInput])
+  }, [newLanguageInput]);
 
   // To handle the recommendations
   const handleRecommendations = async (inputString: string = '') => {
@@ -166,29 +168,27 @@ const LanguageDropdown = () => {
         )}>
         {languageList.length
           ? languageList.map((language, languageIndex) => {
-            return (
-              <LanguageItem
-                data={language}
-                languageList={languageList}
-                setLanguageList={setLanguageList}
-                // Sending placeholder list...
-                placeholderList={placeholderList}
-                setPlaceholderList={setLanguageList}
-                key={languageIndex}
-                draggable
-                onDragStart={() => (dragItem.current = languageIndex)}
-                onDragEnter={() => (dragOverItem.current = languageIndex)}
-                onDragEnd={handleLanguageItemsRearrange}
-                onDragOver={(e) => {
-                  // This will manage the state change after the drag event is over.
-                  e.preventDefault();
-                }}
-              />
-            );
-          })
-          : hasNoData && (
-            <></>
-          )}
+              return (
+                <LanguageItem
+                  data={language}
+                  languageList={languageList}
+                  setLanguageList={setLanguageList}
+                  // Sending placeholder list...
+                  placeholderList={placeholderList}
+                  setPlaceholderList={setLanguageList}
+                  key={languageIndex}
+                  draggable
+                  onDragStart={() => (dragItem.current = languageIndex)}
+                  onDragEnter={() => (dragOverItem.current = languageIndex)}
+                  onDragEnd={handleLanguageItemsRearrange}
+                  onDragOver={(e) => {
+                    // This will manage the state change after the drag event is over.
+                    e.preventDefault();
+                  }}
+                />
+              );
+            })
+          : hasNoData && <></>}
         {/* Rendering add more languages block */}
         {languageList.length !== 10 && (
           <Dialog>
@@ -220,13 +220,17 @@ const LanguageDropdown = () => {
                     list="language-recommendations"
                   />
                   <datalist id="language-recommendations">
-                    {recommendations.map((recommendation, recommendationIndex) => {
-                      return (
-                        <option value={recommendation.value} key={recommendationIndex}>
-                          {recommendation.value}
-                        </option>
-                      )
-                    })}
+                    {recommendations.map(
+                      (recommendation, recommendationIndex) => {
+                        return (
+                          <option
+                            value={recommendation.value}
+                            key={recommendationIndex}>
+                            {recommendation.value}
+                          </option>
+                        );
+                      },
+                    )}
                   </datalist>
                 </div>
               </div>
@@ -290,7 +294,7 @@ const LanguageDropdown = () => {
           }
         })}
       </div>
-    </div >
+    </div>
   );
 };
 
@@ -304,46 +308,46 @@ const LanguageItem: React.FunctionComponent<
   setPlaceholderList,
   ...props
 }) => {
-    // Method to remove a language item from the list.
-    const handleLanguageItemRemoval = (position: number) => {
-      // Copy of the languageList array
-      // @ts-ignore
-      let _languageList: LanguageItemDataType[] = [...languageList];
-      // Filtering the copy array for the languageItem removal at "position"
-      _languageList = _languageList.filter(
-        (languageItem: LanguageItemDataType, languageIndex) => {
-          if (languageIndex !== position) {
-            return languageItem;
-          }
-        },
-      );
-      // After the removal of languageItem at position, we have to traverse
-      // and replace the positions with new locations (i.e. "currentLocations" - 1).
-      _languageList.map((languageItem, languageIndex) => {
-        languageItem.position = languageIndex;
-      });
-      setLanguageList(_languageList);
-      updateLanguageItemRemovalOnFirebase(data.id as string);
-    };
-
-    return (
-      <div
-        className="mb-4 language-item p-4 shadow-2xl rounded-lg bg-gradient-to-t from-neutral-900 to-neutral-700 flex flex-row items-center justify-between"
-        {...props}>
-        <div className="language-item-content-wrapper font-medium text-lg text-neutral-100">
-          {data.title}
-        </div>
-        <div className="flex flex-row items-center justify-end gap-2">
-          <GripVertical color="rgb(163 163 163)" className="cursor-grab" />
-          <Button
-            variant="Outline"
-            className="p-2 bg-neutral-700 border-transparent hover:bg-neutral-700/60"
-            onClick={() => handleLanguageItemRemoval(data.position)}>
-            <X color="rgb(163 163 163)" />
-          </Button>
-        </div>
-      </div>
+  // Method to remove a language item from the list.
+  const handleLanguageItemRemoval = (position: number) => {
+    // Copy of the languageList array
+    // @ts-ignore
+    let _languageList: LanguageItemDataType[] = [...languageList];
+    // Filtering the copy array for the languageItem removal at "position"
+    _languageList = _languageList.filter(
+      (languageItem: LanguageItemDataType, languageIndex) => {
+        if (languageIndex !== position) {
+          return languageItem;
+        }
+      },
     );
+    // After the removal of languageItem at position, we have to traverse
+    // and replace the positions with new locations (i.e. "currentLocations" - 1).
+    _languageList.map((languageItem, languageIndex) => {
+      languageItem.position = languageIndex;
+    });
+    setLanguageList(_languageList);
+    updateLanguageItemRemovalOnFirebase(data.id as string);
   };
+
+  return (
+    <div
+      className="mb-4 language-item p-4 shadow-2xl rounded-lg bg-gradient-to-t from-neutral-900 to-neutral-700 flex flex-row items-center justify-between"
+      {...props}>
+      <div className="language-item-content-wrapper font-medium text-lg text-neutral-100">
+        {data.title}
+      </div>
+      <div className="flex flex-row items-center justify-end gap-2">
+        <GripVertical color="rgb(163 163 163)" className="cursor-grab" />
+        <Button
+          variant="Outline"
+          className="p-2 bg-neutral-700 border-transparent hover:bg-neutral-700/60"
+          onClick={() => handleLanguageItemRemoval(data.position)}>
+          <X color="rgb(163 163 163)" />
+        </Button>
+      </div>
+    </div>
+  );
+};
 
 export default LanguageDropdown;
