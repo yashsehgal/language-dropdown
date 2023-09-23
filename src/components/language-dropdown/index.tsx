@@ -47,7 +47,11 @@ const LanguageDropdown = () => {
 
   // to manage the placeholder array in the list
   const [placeholderList, setPlaceholderList]
-    = useState<string[]>(new Array(9 - languageList.length).fill(""));
+    = useState<string[]>(
+      (languageList.length !== 10 && languageList.length !== 9)
+        ? new Array(9 - languageList.length).fill("")
+        : []
+    );
 
   // Method to manage the input changes in the newLanguage flow
   const handleNewLanguageInput = (inputString: any) => {
@@ -110,7 +114,9 @@ const LanguageDropdown = () => {
       setLanguageList(_preloadLanguageListData);
       setHasNoData(false);
     })();
-    setPlaceholderList(new Array(9 - languageList.length).fill(""))
+    languageList.length !== 10
+      ? setPlaceholderList(new Array(9 - languageList.length).fill(""))
+      : setPlaceholderList([])
   }, [languageList]);
 
   // References for the dragged item and item to replace with
@@ -263,7 +269,7 @@ const LanguageDropdown = () => {
                     setNewLanguageInput('');
                     setRecommendations([]);
                     // Removing a placeholder when language item is saved
-                    setPlaceholderList(new Array(8 - languageList.length).fill(""))
+                    // setPlaceholderList(new Array(8 - languageList.length).fill(""))
                   }}>
                   Save language
                 </Button>
