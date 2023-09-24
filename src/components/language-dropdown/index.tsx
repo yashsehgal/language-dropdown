@@ -214,7 +214,7 @@ const LanguageDropdown = () => {
                     className="mt-2"
                     value={newLanguageInput}
                     onChange={(e) =>
-                      handleNewLanguageInput(e.target.value as string)
+                      handleNewLanguageInput(e.target.value.toLowerCase() as string)
                     }
                     list="language-recommendations"
                   />

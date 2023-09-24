@@ -3,7 +3,7 @@ import LanguageDropdown from './components/language-dropdown';
 const App: React.FunctionComponent = () => {
   return (
     <div className="App-container">
-      <main className="Hero-section">
+      <main className="Hero-section mt-4">
         <h1
           className="leading-snug tracking-tighter font-medium text-4xl"
           aria-description="Manage your skills"

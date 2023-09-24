@@ -9,7 +9,7 @@ async function recommendLanguages(languageParam: string) {
     }`,
   };
 
-  console.log('API getting triggered');
+  console.log('API getting triggered', languageParam);
 
   let recommendations: RecommendationType[] = [];
 
